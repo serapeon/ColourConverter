@@ -1,4 +1,4 @@
-"""Shared L*a*b* channel normalisation helpers for the colorization models.
+"""Shared L*a*b* channel normalisation helpers for the colourisation models.
 
 BaseColor centres and scales the L (lightness) and ab (colour) channels of a
 CIE L*a*b* image into the range the pretrained eccv16/siggraph17 networks
@@ -9,7 +9,7 @@ import torch
 from torch import nn
 
 class BaseColor(nn.Module):
-	"""Provides L*a*b* channel normalisation shared by the colorization models.
+	"""Provides L*a*b* channel normalisation shared by the colourisation models.
 
 	Subclasses (ECCVGenerator, SIGGRAPHGenerator) feed normalised channels
 	into the network and unnormalise its output back to real L*a*b* values.

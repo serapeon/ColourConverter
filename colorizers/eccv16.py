@@ -1,4 +1,4 @@
-"""ECCV16 colorization model (Zhang, Isola & Efros, "Colorful Image
+"""ECCV16 colourisation model (Zhang, Isola & Efros, "Colorful Image
 Colorization", ECCV 2016), vendored from richzhang/colorization.
 
 Predicts the ab (colour) channels of a CIE L*a*b* image from its L

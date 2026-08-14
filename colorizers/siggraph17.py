@@ -1,9 +1,9 @@
-"""SIGGRAPH17 colorization model (Zhang, Zhu, Isola et al., "Real-Time
+"""SIGGRAPH17 colourisation model (Zhang, Zhu, Isola et al., "Real-Time
 User-Guided Image Colorization with Learned Deep Priors", SIGGRAPH 2017),
 vendored from richzhang/colorization.
 
 Newer than eccv16, and generally gives more vibrant, accurate automatic
-(no-hint) colorization; also supports optional user colour hints, though
+(no-hint) colourisation; also supports optional user colour hints, though
 this project only uses it in automatic mode.
 """
 
@@ -160,7 +160,7 @@ class SIGGRAPHGenerator(BaseColor):
                 be a multiple of 8.
             input_B: Raw (unnormalised) ab hint tensor, shape (N, 2, H, W).
                 Optional; if omitted, defaults to all zeros (no hints, i.e.
-                fully automatic colorization).
+                fully automatic colourisation).
             mask_B: Mask marking which pixels of `input_B` carry a real
                 hint, shape (N, 1, H, W). Optional; if omitted, defaults to
                 all zeros (no hints provided anywhere).
