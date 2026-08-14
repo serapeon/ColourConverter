@@ -80,6 +80,6 @@ Built with Python, OpenCV & PyTorch | [github.com/serapeon](https://github.com/s
 
 ## Licence
 
-This project is licensed under the [MIT License](LICENSE). You are free to
+This project is licensed under the [MIT Licence](LICENSE). You are free to
 use, modify, and distribute this code, provided the original copyright notice
 is retained.
