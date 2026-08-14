@@ -1,9 +1,31 @@
+"""SIGGRAPH17 colorization model (Zhang, Zhu, Isola et al., "Real-Time
+User-Guided Image Colorization with Learned Deep Priors", SIGGRAPH 2017),
+vendored from richzhang/colorization.
+
+Newer than eccv16, and generally gives more vibrant, accurate automatic
+(no-hint) colorization; also supports optional user colour hints, though
+this project only uses it in automatic mode.
+"""
+
 import torch
 import torch.nn as nn
 
 from .base_color import *
 
 class SIGGRAPHGenerator(BaseColor):
+    """The SIGGRAPH17 generator network: L channel (+ optional colour hints) in, ab channels out.
+
+    Architecture: a U-Net-style encoder/decoder with three downsampling
+    stages (`model1`-`model3`, via strided slicing) into three dilated
+    "bottleneck" stages (`model4`-`model7`), then a decoder (`model8`-
+    `model10`) that upsamples back via transposed convolutions, each stage
+    adding a skip connection (`model3short8`, `model2short9`,
+    `model1short10`) from the matching encoder resolution. Unlike eccv16,
+    the decoder path fully recovers the input resolution on its own -- no
+    final upsample layer is needed. Because of the skip connections, input
+    height and width must each be a multiple of 8.
+    """
+
     def __init__(self, norm_layer=nn.BatchNorm2d, classes=529):
         super(SIGGRAPHGenerator, self).__init__()
 
@@ -130,6 +152,23 @@ class SIGGRAPHGenerator(BaseColor):
         self.softmax = nn.Sequential(*[nn.Softmax(dim=1),])
 
     def forward(self, input_A, input_B=None, mask_B=None):
+        """Predicts ab channels for a batch of L channels, with optional user colour hints.
+
+        Args:
+            input_A: Raw (unnormalised) L channel tensor, shape
+                (N, 1, H, W), values in the range 0-100. H and W must each
+                be a multiple of 8.
+            input_B: Raw (unnormalised) ab hint tensor, shape (N, 2, H, W).
+                Optional; if omitted, defaults to all zeros (no hints, i.e.
+                fully automatic colorization).
+            mask_B: Mask marking which pixels of `input_B` carry a real
+                hint, shape (N, 1, H, W). Optional; if omitted, defaults to
+                all zeros (no hints provided anywhere).
+
+        Returns:
+            Raw (unnormalised) ab channel tensor, shape (N, 2, H, W), at the
+            same spatial resolution as `input_A`.
+        """
         if(input_B is None):
             input_B = torch.cat((input_A*0, input_A*0), dim=1)
         if(mask_B is None):
@@ -154,6 +193,17 @@ class SIGGRAPHGenerator(BaseColor):
         return self.unnormalize_ab(out_reg)
 
 def siggraph17(pretrained=True):
+    """Builds a SIGGRAPHGenerator, optionally loading the original pretrained weights.
+
+    Args:
+        pretrained: If True, downloads (and caches via torch's model zoo)
+            the original "siggraph17" weights published by the paper
+            authors.
+
+    Returns:
+        A SIGGRAPHGenerator instance (not yet moved to a device or set to
+        eval mode -- callers should call `.eval()` themselves for inference).
+    """
     model = SIGGRAPHGenerator()
     if(pretrained):
         import torch.utils.model_zoo as model_zoo

@@ -1,9 +1,27 @@
+"""ECCV16 colorization model (Zhang, Isola & Efros, "Colorful Image
+Colorization", ECCV 2016), vendored from richzhang/colorization.
+
+Predicts the ab (colour) channels of a CIE L*a*b* image from its L
+(lightness) channel alone. Fully convolutional, so it accepts any input
+resolution, but was trained on 256x256 crops.
+"""
+
 import torch
 import torch.nn as nn
 
 from .base_color import *
 
 class ECCVGenerator(BaseColor):
+    """The ECCV16 generator network: L channel in, ab channels out.
+
+    Architecture: a VGG-style encoder (`model1`-`model7`, downsampling twice
+    then holding resolution via dilated convolutions) followed by a small
+    decoder (`model8`) that upsamples partway, a softmax classification over
+    313 quantised colour bins, a learned 1x1 conv to decode those bins back
+    to continuous ab values, and a final 4x bilinear upsample to recover the
+    input resolution.
+    """
+
     def __init__(self, norm_layer=nn.BatchNorm2d):
         super(ECCVGenerator, self).__init__()
 
@@ -82,6 +100,16 @@ class ECCVGenerator(BaseColor):
         self.upsample4 = nn.Upsample(scale_factor=4, mode='bilinear')
 
     def forward(self, input_l):
+        """Predicts ab channels for a batch of L channels.
+
+        Args:
+            input_l: Raw (unnormalised) L channel tensor, shape
+                (N, 1, H, W), values in the range 0-100.
+
+        Returns:
+            Raw (unnormalised) ab channel tensor, shape (N, 2, H, W), at the
+            same spatial resolution as `input_l`.
+        """
         conv1_2 = self.model1(self.normalize_l(input_l))
         conv2_2 = self.model2(conv1_2)
         conv3_3 = self.model3(conv2_2)
@@ -95,6 +123,17 @@ class ECCVGenerator(BaseColor):
         return self.unnormalize_ab(self.upsample4(out_reg))
 
 def eccv16(pretrained=True):
+	"""Builds an ECCVGenerator, optionally loading the original pretrained weights.
+
+	Args:
+		pretrained: If True, downloads (and caches via torch's model zoo)
+			the original "colorization_release_v2" weights, ported from the
+			paper authors' Caffe model to this PyTorch architecture.
+
+	Returns:
+		An ECCVGenerator instance (not yet moved to a device or set to
+		eval mode -- callers should call `.eval()` themselves for inference).
+	"""
 	model = ECCVGenerator()
 	if(pretrained):
 		import torch.utils.model_zoo as model_zoo
