@@ -32,6 +32,22 @@ model, run from a Jupyter notebook.
    (slower) or faster results (coarser colour) — see the comment above it for
    the measured tradeoff.
 
+## Example
+
+<table>
+<tr>
+<th>Before</th>
+<th>After</th>
+</tr>
+<tr>
+<td><img src="pexels-huy.jpg" width="400" alt="Greyscale photo of a woman taking a photo with a film camera"></td>
+<td><img src="pexels-huy-colourised.jpg" width="400" alt="The same photo, AI-colourised"></td>
+</tr>
+</table>
+
+Photo by [HUY JPEG](https://www.pexels.com/photo/woman-taking-a-photo-in-black-and-white-17101835/)
+via [Pexels](https://www.pexels.com/).
+
 ## Features
 
 - AI colourisation via a pretrained PyTorch model (`siggraph17`, from
